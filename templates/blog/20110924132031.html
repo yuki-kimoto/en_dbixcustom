@@ -2,224 +2,224 @@
   <ul itemscope itemtype = "http://schema.org/BreadcrumbList">
     <li itemprop = "itemListElement" itemscope itemtype = "http://schema.org/ListItem">
       <a itemprop="item" href="/">
-        <span itemprop = "name"> DBIx :: Custom </ span>
-      </a>
+        <span itemprop = "name"> DBIx::Custom </span>
+     </a>
       <meta itemprop = "position" content = "1" />
-    </ li>
+    </li>
     <li>
       here
-    </ li>
-  </ ul>
-</ div>
+    </li>
+  </ul>
+</div>
 
-<h2> Dynamically create a where clause </ h2>
+<h2> Dynamically create a where clause </h2>
 
-I will explain how to "dynamically create a where clause" with DBIx :: Custom.
+I will explain how to "dynamically create a where clause" with DBIx::Custom.
 
-<h3> Dynamic Where clause generation </ h3>
+<h3> Dynamic Where clause generation </h3>
 
-DBIx :: Custom can dynamically generate a Where clause. For example, if a given parameter contains only title, generate a Where clause that contains only the title condition, and if the parameter contains only price, then only the price condition is included. It's easy to generate a Where clause.
+DBIx::Custom can dynamically generate a Where clause. For example, if a given parameter contains only title, generate a Where clause that contains only the title condition, and if the parameter contains only price, then only the price condition is included. It's easy to generate a Where clause.
 
-<h4> Basics of dynamic Where clause generation </ h4>
+<h4> Basics of dynamic Where clause generation </h4>
 
-<b> DBIx :: Custom :: Where Object Creation </ b>
+<b> DBIx::Custom::Where Object Creation </b>
 
-First, create a DBIx :: Custom :: Where object. You can use the DBIx :: Custom where method to create a DBIx :: Custom :: Where object.
-
-<pre>
-my $ where = $ dbi-> where;
-</ pre>
-
-<h4> Where clause settings </ h4>
-
-Write the Where clause using the clause attribute. (: title,: price are named placeholders. See the description of <a href="/blog/20110708131364.html"> execute method </a>.)
+First, create a DBIx::Custom::Where object. You can use the DBIx::Custom where method to create a DBIx::Custom::Where object.
 
 <pre>
-$ where-> clause (['and','title like: title','price =: price']);
-</ pre>
+my $where = $dbi->where;
+</pre>
+
+<h4> Where clause settings </h4>
+
+Write the Where clause using the clause attribute. (: title,: price are named placeholders. See the description of <a href="/blog/20110708131364.html"> execute method</a>.)
+
+<pre>
+$where->clause(['and','title like: title','price =: price']);
+</pre>
 
 You need to specify an array reference, the first element being the operator. Operators can use "and" and "or". After the second element, you specify the condition, but you need to include only one named placeholder.
 
 You can also specify a character string if there is only one condition.
 
 <pre>
-$ where-> clause ('title like: title');
-</ pre>
+$where->clause('title like: title');
+</pre>
 
 In this case, it has the same meaning as the following description.
 
 <pre>
-$ where-> clause (['and','title like: title']);
-</ pre>
+$where->clause(['and','title like: title']);
+</pre>
 
-<h4> Where clause generation </ h4>
+<h4> Where clause generation </h4>
 
-To generate a Where clause, use the to_string method or evaluate the DBIx :: Custom :: Where object as a string.
+To generate a Where clause, use the to_string method or evaluate the DBIx::Custom::Where object as a string.
 
 <pre>
 # to_string method
-my $ where_clause = $ where-> to_string;
+my $where_clause = $where->to_string;
 
 #Evaluated as a string
-my $ where_clause = "$ where";
-</ pre>
+my $where_clause = "$where";
+</pre>
 
 You can generate a Where clause like this:
 
 <pre>
 where title like: title and price =: price
-</ pre>
+</pre>
 
-<h4> Dynamic Where clause generation </ h4>
+<h4> Dynamic Where clause generation </h4>
 
 You can easily generate a Where clause dynamically. To generate a Where clause that contains only the price condition, pass the hash reference data that includes price in the param key.
 
 <pre>
-$ where-> clause (['and','title like: title','price =: price']);
-$ where-> param ({price => 1900});
-my $ where_clause = "$ where";
-</ pre>
+$where->clause(['and','title like: title','price =: price']);
+$where->param({price => 1900});
+my $where_clause = "$where";
+</pre>
 
 A Where clause similar to the following is generated:
 
 <pre>
 where price =: price
-</ pre>
+</pre>
 
 To generate a Where clause that contains only the title condition, pass the hash reference data that includes the title in the param key.
 
 <pre>
-$ where-> clause (['and','title like: title','price =: price']);
-$ where-> param ({title =>'Perl'});
-my $ where_clause = "$ where";
-</ pre>
+$where->clause(['and','title like: title','price =: price']);
+$where->param({title =>'Perl'});
+my $where_clause = "$where";
+</pre>
 
 A Where clause similar to the following is generated:
 
 <pre>
 where title like: title
-</ pre>
+</pre>
 
 If neither is included, the Where clause will not be generated and you can get the empty string.
 
 <pre>
-$ where-> clause (['and','title like: title','price =: price']);
-$ where-> param ({});
-my $ where_clause = "$ where"; #empty string
-</ pre>
+$where->clause(['and','title like: title','price =: price']);
+$where->param({});
+my $where_clause = "$where"; #empty string
+</pre>
 
-<h4> Use the column name prefixed with the table name </ h4>
+<h4> Use the column name prefixed with the table name </h4>
 
 You can also use the column name prefixed with the table name. It also supports when you need to distinguish it from columns in other tables.
 
 <pre>
-$ where-> clause (['and','book.title like: book.title','book.price =: book.price']);
-</ pre>
+$where->clause(['and','book.title like: book.title','book.price =: book.price']);
+</pre>
 
-<h3> Application of Where clause generation </ h3>
+<h3> Application of Where clause generation </h3>
 
-<h4> When two or more columns with the same name are included </ h4>
+<h4> When two or more columns with the same name are included </h4>
 
 For example, if you want to write a comparison condition, you need to write a condition that includes the same column name. We also support such cases. The parameter must have a value specified in the array reference.
 
 <pre>
-$ where-> clause (['and','price>: price','price <: price']);
-$ where-> param ({price => [1000, 2000]});
-</ pre>
+$where->clause(['and','price>: price','price <: price']);
+$where->param({price => [1000, 2000]});
+</pre>
 
 A Where clause similar to the following is generated:
 
 <pre>
 where price>: price and price <: price
-</ pre>
+</pre>
 
-If you want to dynamically generate only the first condition, do the following: The second element of the array reference is a DBIx :: Custom :: NotExists object that indicates it doesn't exist. This can be obtained with the not_exists method.
+If you want to dynamically generate only the first condition, do the following: The second element of the array reference is a DBIx::Custom::NotExists object that indicates it doesn't exist. This can be obtained with the not_exists method.
 
 <pre>
-$ where-> clause (['and','price>: price','price <: price']);
-$ where-> param ({price => [1000, $ dbi-> not_exists]});
-</ pre>
+$where->clause(['and','price>: price','price <: price']);
+$where->param({price => [1000, $dbi->not_exists]});
+</pre>
 
 A where clause similar to the following is generated.
 
 <pre>
 where price>: price
-</ pre>
+</pre>
 
-If you want to dynamically generate only the second condition, do the following: The first element of the array reference is a DBIx :: Custom :: NotExists object that indicates it doesn't exist.
+If you want to dynamically generate only the second condition, do the following: The first element of the array reference is a DBIx::Custom::NotExists object that indicates it doesn't exist.
 
 <pre>
-$ where-> clause (['and','price>: price','price <: price']);
-$ where-> param ({price => [$ dbi-> not_exists, 2000]});
-</ pre>
+$where->clause(['and','price>: price','price <: price']);
+$where->param({price => [$dbi->not_exists, 2000]});
+</pre>
 
 A where clause similar to the following is generated.
 
 <pre>
 where price <: price
-</ pre>
+</pre>
 
-<h4> Complex conditions </ h4>
+<h4> Complex conditions </h4>
 
 You can also write complex conditions, such as nested conditions.
 
 <pre>
-$ where-> clause (
+$where->clause(
   [
     'and',
     'price =: price',
     ['or','title =: title','title =: title','title =: title']
   ]
 );
-$ where-> param ({price => '1000', title => ['Perl','Ruby','Python']});
-my $ where_clause = "$ where";
-</ pre>
+$where->param({price => '1000', title => ['Perl','Ruby','Python']});
+my $where_clause = "$where";
+</pre>
 
 A Where clause similar to the following is generated:
 
 <pre>
 where price =: price and (title =: title or title =: title or title =: title)
-</ pre>
+</pre>
 
 Even if the nesting structure becomes complicated, the Where clause can be generated correctly and dynamically. For example, it will correctly generate a Where clause if the following parameters are passed:
 
 <pre>
-$ where-> param ({price => 1900, title => ['Perl','Ruby']});
-</ pre>
+$where->param({price => 1900, title => ['Perl','Ruby']});
+</pre>
 
 Since the array reference contains only two values, the following Where clause is generated:
 
 <pre>
 where price =: price and (title =: title or title =: title)
-</ pre>
+</pre>
 
-<h3> Conditions that do not include named placeholders </ h3>
+<h3> Conditions that do not include named placeholders </h3>
 
 You can also write conditions that do not include named placeholders.
 
 <pre>
-$ where-> clause (['and', "title ='Perl'"]);
-</ pre>
+$where->clause(['and', "title ='Perl'"]);
+</pre>
 
 Regardless of the value of the parameter, this condition will always be included in the where section.
 
 
-<h3> or search by condition </ h3>
+<h3> or search by condition </h3>
 
-To search using the or condition, do the following. DBIx :: Custom provides a DBIx :: Custom :: Where object to handle complex Where conditions when the Where condition becomes complicated. You can use the where method to create a new, well-configured DBIx :: Custom :: Where object.
+To search using the or condition, do the following. DBIx::Custom provides a DBIx::Custom::Where object to handle complex Where conditions when the Where condition becomes complicated. You can use the where method to create a new, well-configured DBIx::Custom::Where object.
 
 <pre>
 # where (title ='Perl' or title ='Ruby') and price> 1500
-my $ where = $ dbi-> where;
-my $ titles = [qw / Perl Ruby /];
-my $ clause = ['and',
-  ['or', ('title =: title') x @ $ titles],
+my $where = $dbi->where;
+my $titles = [qw / Perl Ruby /];
+my $clause = ['and',
+  ['or', ('title =: title') x @$titles],
   'price>: price'
 ];;
-my $ param = {title => $ titles, price => 1500};
-$ where-> clause ($ clause);
-$ where-> param ($ param);
-</ pre>
+my $param = {title => $titles, price => 1500};
+$where->clause($clause);
+$where->param($param);
+</pre>
 
 The following is a sample using SQLite. The model is also used well, so the code is less duplicated.
 
@@ -227,95 +227,93 @@ The following is a sample using SQLite. The model is also used well, so the code
 use strict;
 use warnings;
 
-use DBIx :: Custom;
+use DBIx::Custom;
 
 #Connect
-my $ dbi = DBIx :: Custom-> connect (dsn => "dbi: SQLite: dbname =: memory:");#Create table
-$ dbi-> execute ("create table book (title, price)");
-my $ model = $ dbi-> create_model (table =>'book');
-$ model-> insert ({title =>'Perl', price => 1900});
-$ model-> insert ({title =>'Ruby', price => 2000});
-$ model-> insert ({title =>'Python', price => 2100});
+my $dbi = DBIx::Custom->connect(dsn => "dbi: SQLite: dbname =: memory:");#Create table
+$dbi->execute("create table book (title, price)");
+my $model = $dbi->create_model(table =>'book');
+$model->insert({title =>'Perl', price => 1900});
+$model->insert({title =>'Ruby', price => 2000});
+$model->insert({title =>'Python', price => 2100});
 
 # Where, (title ='Perl' or title ='Ruby') and price> 1500
-my $ where = $ dbi-> where;
-my $ titles = [qw / Perl Ruby /];
-my $ clause = ['and',
-  ['or', ('title =: title') x @ $ titles],
+my $where = $dbi->where;
+my $titles = [qw / Perl Ruby /];
+my $clause = ['and',
+  ['or', ('title =: title') x @$titles],
   'price>: price'
 ];;
-my $ param = {title => $ titles, price => 1500};
-$ where-> clause ($ clause);
-$ where-> param ($ param);
+my $param = {title => $titles, price => 1500};
+$where->clause($clause);
+$where->param($param);
 
 #Select
-my $ result = $ model-> select (where => $ where);
+my $result = $model->select(where => $where);
 
 # Fetch
-my $ rows = $ result-> all;
-</ pre>
+my $rows = $result->all;
+</pre>
 
-<h3> Specify the date range in the Where clause </ h3>
+<h3> Specify the date range in the Where clause </h3>
 
-Retrieving data from a database date to a certain date is a common operation. Both dates may be specified, or only one date may be specified. In such a case, it is troublesome to write a conditional branch by yourself. If you use the DBIx :: Custom :: Where object, you can write it with a little ingenuity.
+Retrieving data from a database date to a certain date is a common operation. Both dates may be specified, or only one date may be specified. In such a case, it is troublesome to write a conditional branch by yourself. If you use the DBIx::Custom::Where object, you can write it with a little ingenuity.
 
 <pre>
-my $ start_date = '2010-01-01';
-my $ end_date = '2010-03-31';
+my $start_date = '2010-01-01';
+my $end_date = '2010-03-31';
 
-# DBIx :: Custom :: Where object
-my $ where = $ dbi-> where;
+# DBIx::Custom::Where object
+my $where = $dbi->where;
 
 #Where clause description
-$ where-> clause (['and',': date {>}',': date {<}'}]);
+$where->clause(['and',': date {>}',': date {<}'}]);
 
 # Parameter setting
-my $ param = {
+my $param = {
   date => [
-    $ start_date? $ start_date: $ dbi-> not_exists,
-    $ end_date? $ end_date: $ dbi-> not_exists
-  ]
+    $start_date? $start_date: $dbi->not_exists,
+    $end_date? $end_date: $dbi->not_exists  ]
 };;
-$ where-> param ($ param);
+$where->param($param);
 
 Run #select
-$ dbi-> select (table =>'book', where => $ where);
-</ pre>
+$dbi->select(table =>'book', where => $where);
+</pre>
 
-First, create a DBIx :: Custom :: Where object with the where method. Next, in the clause, write the Where clause. This is described using the DBIx :: Custom tag. In the above example
+First, create a DBIx::Custom::Where object with the where method. Next, in the clause, write the Where clause. This is described using the DBIx::Custom tag. In the above example
 
 <pre>
 ['and',': date {>}',': date {<}'}]
-</ pre>
+</pre>
 
 Is expanded as follows.
 
 <pre>
 where date>? and date <?
-</ pre>
+</pre>
 
 This is dynamic, for example, if no start time is given, it expands as follows:
 
 <pre>
 where date <?
-</ pre>
+</pre>
 
-Next is the description of the parameters. Since you need to specify two dates, specify them in the array reference. If it does exist, specify its value, and if it does not exist, use the not_exists method to specify the DBIx :: Custom :: NotExists object.
+Next is the description of the parameters. Since you need to specify two dates, specify them in the array reference. If it does exist, specify its value, and if it does not exist, use the not_exists method to specify the DBIx::Custom::NotExists object.
 
 <pre>
 # Parameter setting
-my $ param = {
+my $param = {
   date => [
-    $ start_date? $ start_date: $ dbi-> not_exists,
-    $ end_date? $ end_date: $ dbi-> not_exists
-  ]
+    $start_date? $start_date: $dbi->not_exists,
+    $end_date? $end_date: $dbi->not_exists  ]
 };;
-$ where-> param ($ param);
-</ pre>
+$where->param($param);
+</pre>
 
-Finally, pass the created DBIx :: Custom object to where in the select area.
+Finally, pass the created DBIx::Custom object to where in the select area.
 
 <pre>
 Run #select
-$ dbi-> select (table =>'book', where => $ where);
-</ pre>
+$dbi->select(table =>'book', where => $where);
+</pre>

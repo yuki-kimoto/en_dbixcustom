@@ -2,170 +2,170 @@
   <ul itemscope itemtype = "http://schema.org/BreadcrumbList">
     <li itemprop = "itemListElement" itemscope itemtype = "http://schema.org/ListItem">
       <a itemprop="item" href="/">
-        <span itemprop = "name"> DBIx :: Custom </ span>
-      </a>
+        <span itemprop = "name"> DBIx::Custom </span>
+     </a>
       <meta itemprop = "position" content = "1" />
-    </ li>
+    </li>
     <li>
       here
-    </ li>
-  </ ul>
-</ div>
+    </li>
+  </ul>
+</div>
 
-<h2> Utility </ h2>
+<h2> Utility </h2>
 
-<h3> Get the last executed SQL --last_sql </ h3>
+<h3> Get the last executed SQL --last_sql </h3>
 
-Use the <strong> last_sql </ strong> method to get the last executed SQL.
+Use the <strong> last_sql </strong> method to get the last executed SQL.
 
 <pre>
-my $ last_sql = $ dbi-> last_sql;
-</ pre>
+my $last_sql = $dbi->last_sql;
+</pre>
 
 This is useful when debugging.
 
-<h3> Check the executed SQL </ h3>
+<h3> Check the executed SQL </h3>
 
-To see what SQL was actually executed, set the environment variable <strogn> DBIX_CUSTOM_DEBUG </ strong> to a true value (for example, 1). The SQL executed and the bound value are output to the standard error output.
-
-<pre>
-$ ENV {DBIX_CUSTOM_DEBUG} = 1
-</ pre>
-
-<h3> Register helper method --helper </ h3>
-
-Use the <strong> helper </ strong> method to register a helper method.
+To see what SQL was actually executed, set the environment variable <strogn> DBIX_CUSTOM_DEBUG </strong> to a true value (for example, 1). The SQL executed and the bound value are output to the standard error output.
 
 <pre>
-$ dbi-> helper (
+$ENV {DBIX_CUSTOM_DEBUG} = 1
+</pre>
+
+<h3> Register helper method --helper </h3>
+
+Use the <strong> helper </strong> method to register a helper method.
+
+<pre>
+$dbi->helper(
   find_or_create => sub {
-    my $ self = shift;
+    my $self = shift;
     ...
   }
 );
-</ pre>
+</pre>
 
-The registered helper method can be called directly from the DBIx :: Custom object.
-
-<pre>
-$ dbi-> find_or_create;
-</ pre>
-
-<h3> Merge parameters --merge_param </ h3>
-
-Use the <strong> merge_param </ strong> method to merge the two parameters.
+The registered helper method can be called directly from the DBIx::Custom object.
 
 <pre>
-my $ param = $ dbi-> merge_param ({key1 => 1}, {key1 => 1, key2 => 2});
-</ pre>
+$dbi->find_or_create;
+</pre>
+
+<h3> Merge parameters --merge_param </h3>
+
+Use the <strong> merge_param </strong> method to merge the two parameters.
+
+<pre>
+my $param = $dbi->merge_param({key1 => 1}, {key1 => 1, key2 => 2});
+</pre>
 
 Get the new parameters as follows: If they contain the same key, the values ​​are merged into the array reference.
 
 <pre>
 {key1 => [1, 1], key2 => 2}
-</ pre>
+</pre>
 
-<h3> Create DBIx :: Custom object --new </ h3>
+<h3> Create DBIx::Custom object --new </h3>
 
-Use the <strong> new </ strong> method to create a DBIx :: Custom object.
+Use the <strong> new </strong> method to create a DBIx::Custom object.
 
 <pre>
-my $ dbi = DBIx :: Custom-> new (
+my $dbi = DBIx::Custom->new(
   dsn => "dbi: mysql: database = dbname",
   user =>'ken',
-  password =>'! LFKD% $ &',
+  password =>'! LFKD%$&',
   option => {mysql_enable_utf8 => 1}
 );
-</ pre>
+</pre>
 
 The difference from the connect method is that the new method does not make a connection. If you want to connect the object after it is created, call the connect method.
 
 <pre>
-$ dbi-> connect;
-</ pre>
+$dbi->connect;
+</pre>
 
-<h3> Get database handle --dbh </ h3>
+<h3> Get database handle --dbh </h3>
 
-Use the <strong> dbh </ strong> method to get the database handle.
+Use the <strong> dbh </strong> method to get the database handle.
 
 <pre>
-my $ dbh = $ dbi-> dbh;
-</ pre>
+my $dbh = $dbi->dbh;
+</pre>
 
 If the connection manager is set in the connector, the database handle will be obtained via the connection manager.
 
-<h3> Check the existence of the table </ h3>
+<h3> Check the existence of the table </h3>
 
 You may want to check if the table already exists in the database. In such cases, it's easy to use the each_column method to find out if there is a table to specify. The each_column method is a method to get all columns, but since it also receives table information as an argument, it can also be used in this way.
 
 <pre>
-my $ table_exists;
-$ dbi-> each_column (sub {
-  my ($ dbi, $ table, $ column) = @_;
-  $ table_exists = 1 if $ table eq'book';
+my $table_exists;
+$dbi->each_column(sub {
+  my ($dbi, $table, $column) = @_;
+  $table_exists = 1 if $table eq'book';
 });
-</ pre>
+</pre>
 
-<h3> Use Mojolicious :: Lite, DBIx :: Custom and DBD :: mysql to access DB non-blocking like node.js </ h3>
+<h3> Use Mojolicious::Lite, DBIx::Custom and DBD::mysql to access DB non-blocking like node.js </h3>
 
-DBIx :: Custom is still in the experimental stage, but with the help of AnyEvent, it is now possible to query the database without blocking.
+DBIx::Custom is still in the experimental stage, but with the help of AnyEvent, it is now possible to query the database without blocking.
 
 I'm throwing SQL that waits for 5 seconds, but even if there are multiple requests, I can process the requests without blocking. With this, it seems that Perl can easily make non-blocking queries to the database that you want to do with nodel.js.
 
 <pre>
-use Mojolicious :: Lite;
+use Mojolicious::Lite;
 use EV;
-use DBIx :: Custom;
+use DBIx::Custom;
 
-my $ dbi = DBIx :: Custom-> connect (
+my $dbi = DBIx::Custom->connect(
   dsn =>'dbi: mysql: database = usertest',
   user =>'root'
 );
 
-$ dbi-> async_conf ({{
+$dbi->async_conf({{
   prepare_attr => {async => 1},
-  fh => sub {shift-> dbh-> mysql_fd}
+  fh => sub {shift->dbh->mysql_fd}
 });
 
 get'/' => sub {
-  my $ self = shift;
+  my $self = shift;
   
-  $ self-> render_later;
-  $ dbi-> select ('SLEEP (5), 3', async => sub {
-    my ($ dbi, $ result) = @_;
-    my $ row = $ result-> fetch_one;
-    $ self-> render (text => $ row-> [1]);
+  $self->render_later;
+  $dbi->select('SLEEP (5), 3', async => sub {
+    my ($dbi, $result) = @_;
+    my $row = $result->fetch_one;
+    $self->render(text => $row->[1]);
   });
 };;
 
-app-> start;
-</ pre>
+app->start;
+</pre>
 
-The mechanism is like this. First of all, Mojolicious has a non-blocking HTTP server, and as an internal implementation, it goes around the IO loop inside. When Mojolicious has an EV, it can switch from its own Mojo :: IOLoop to an IO loop using EV. In DBIx :: Custom, the event is registered using AnyEvent. Since I am using EV, I will register more and more events in EV. Mojolicious also registers his events on EV more and more. It spins round and round and processes in order from the one that has finished waiting for IO.
+The mechanism is like this. First of all, Mojolicious has a non-blocking HTTP server, and as an internal implementation, it goes around the IO loop inside. When Mojolicious has an EV, it can switch from its own Mojo::IOLoop to an IO loop using EV. In DBIx::Custom, the event is registered using AnyEvent. Since I am using EV, I will register more and more events in EV. Mojolicious also registers his events on EV more and more. It spins round and round and processes in order from the one that has finished waiting for IO.
 
 However, this is still a super-experimental process, so I'd be happy if you could try it for any problems.
 
 
-<h3> Stop the analysis function of the deprecated tag to improve the performance </ h3>
+<h3> Stop the analysis function of the deprecated tag to improve the performance </h3>
 
-Until the deprecated features are removed, DBIx :: Custom performance is not optimized by default due to backwards compatibility policy. Previously we implemented a feature called tags, but for performance reasons this feature has been replaced by named placeholders.
+Until the deprecated features are removed, DBIx::Custom performance is not optimized by default due to backwards compatibility policy. Previously we implemented a feature called tags, but for performance reasons this feature has been replaced by named placeholders.
 
-You can improve the performance of DBIx :: Custom a little by stopping the tag parsing function.
+You can improve the performance of DBIx::Custom a little by stopping the tag parsing function.
 
 <pre>
-$ ENV {DBIX_CUSTOM_TAG_PARSE} = 0;
-</ pre>
+$ENV {DBIX_CUSTOM_TAG_PARSE} = 0;
+</pre>
 
 In the future, the removal of many other deprecated features will result in a slight overall performance improvement.
 
-Mapping <h3> parameters --mapper </ h3>
+Mapping <h3> parameters --mapper </h3>
 
-I think that you often convert the parameters received from the URL into the parameters for the database. In such a case, use the mapper method to create a DBIx :: Custom :: Mapper object and use it.
+I think that you often convert the parameters received from the URL into the parameters for the database. In such a case, use the mapper method to create a DBIx::Custom::Mapper object and use it.
 
 <pre>
 #Generation of mapper
-my $ mapper = $ dbi-> mapper (param => $ param);
-</ pre>
+my $mapper = $dbi->mapper(param => $param);
+</pre>
 
 Suppose the parameters are as follows:
 
@@ -176,79 +176,79 @@ Suppose the parameters are as follows:
   a =>'Ken',
   b =>'XXX'
 }
-</ pre>
+</pre>
 
 You can use the map method to map the parameters.
 
 <pre>
 #Mapping
-my $ new_param = $ mapper-> map (
-  t => [title =>'% <value>'], # map key to value
+my $new_param = $mapper->map(
+  t => [title =>'%<value>'], # map key to value
   p => [price =>'<value>'], # map only key
-  a => [a =>'% <value>%'] # Map only values
+  a => [a =>'%<value>%'] # Map only values
 );
-</ pre>
+</pre>
 
 The format is as follows.
 
 <pre>
 Original key name => [new key name => new value]
-</ pre>
+</pre>
 
-The original value can be expressed in the format <b> & lt; value & gt; </ b>. You can also use it to create new values ​​such as <b>% Perl </ b>.
+The original value can be expressed in the format <b> & lt; value & gt; </b>. You can also use it to create new values ​​such as <b>%Perl </b>.
 
 It maps to the following parameters:
 
 <pre>
 {
-  title =>'% Perl',
+  title =>'%Perl',
   price => 1000,
-  a =>'% Ken%'
+  a =>'%Ken%'
 }
-</ pre>
+</pre>
 
 Keys not specified in the map method will not be mapped. The key b is not mapped in this sample.
 
 If you want to change the value a little more flexibly, you can use the subroutine reference. Since the original value can be obtained with the first argument, the new value is returned.
 
 <pre>
-Original key name => [new key name => sub {return'%'. $ _ [0].'%'}]
-</ pre>
+Original key name => [new key name => sub {return'%'. $_ [0].'%'}]
+</pre>
 
-<h4> Parameter mapping conditions </ h4>
+<h4> Parameter mapping conditions </h4>
 
 The default mapping conditions are as follows:
 
 <pre>
 The value is defined and there is a length
-</ pre>
+</pre>
 
 So the following parameters are mapped.
 
 <pre>
 title =>'Perl',
-</ pre>
+</pre>
 
 However, anything that does not have an empty string, undefined value, or the key itself will not be mapped. This is because the mapping is intended for web applications.
 
 <pre>
 title =>'',
 title => undef
-</ pre>
+</pre>
 
 Use the condition attribute to change this condition. You can set the reference of any subroutine or the strings "length", "defined" and "exists" as special values.
 
 <pre>
-$ mapper-> condition ('length'); # Same as default
-$ mapper-> condition ('defined'); #value is definedRu
-$ mapper-> condition ('exists'); # key exists
-$ mapper-> condition (sub {defined $ _ [0]}); # Reference to any subroutine
-</ pre>
+$mapper->condition('length'); # Same as default
+$mapper->condition('defined'); #value is definedRu
+$mapper->condition('exists'); # key exists
+$mapper->condition(sub {defined $_ [0]}); # Reference to any subroutine
+</pre>
 
 It is also possible to set each key individually as follows with the map method.
 
 <pre>
-$ mapper-> map (
+$mapper->map(
    Old key => [new key => new value, {condtion =>'defined'}],
 );
-</ pre>
+</pre>

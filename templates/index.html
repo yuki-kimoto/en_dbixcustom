@@ -1,12 +1,12 @@
-<h2> DBIx :: Custom documentation </h2>
+<h2> DBIx::Custom documentation </h2>
 
-DBIx :: Custom is Perl's O / R mapper. An O / R mapper is a module that makes it easy to access the database.
+DBIx::Custom is Perl's O / R mapper. An O / R mapper is a module that makes it easy to access the database.
 
-DBIx :: Custom is one of the options you can consider if you find it difficult to work with raw DBI or prefer a simple O / R mapper to a more abstract O / R mapper.
+DBIx::Custom is one of the options you can consider if you find it difficult to work with raw DBI or prefer a simple O / R mapper to a more abstract O / R mapper.
 
-<h3> Features of DBIx :: Custom </h3>
+<h3> Features of DBIx::Custom </h3>
 
-It is a feature of DBIx :: Custom.
+It is a feature of DBIx::Custom.
 
 <ul>
   <li>
@@ -40,17 +40,17 @@ It is a feature of DBIx :: Custom.
 Connect to the database.
 
 <pre>
-use DBIx :: Custom;
+use DBIx::Custom;
 
 #Connect to SQLite
-my $ dbi = DBIx :: Custom-> connect ('dbi: SQLite: dbname = bookshop');
+my $dbi = DBIx::Custom->connect('dbi: SQLite: dbname = bookshop');
 
 #Connect to MySQL, MariaDB (supports utf8mb4)
 #Connection management is done by default and works fine on prefolk servers
-my $ dbi = DBIx :: Custom-> connect (
+my $dbi = DBIx::Custom->connect(
   'dbi: mysql: database = bookshop',
   'ken',
-  '! LFKD% $ &',
+  '! LFKD%$&',
   {mysql_enable_utf8mb4 => 1}
 );
 </pre>
@@ -63,10 +63,10 @@ Create a model.
 
 <pre>
 #Create a model
-$ dbi-> model ('book');
+$dbi->model('book');
 
 #Create a model When defining a join clause
-$ dbi-> model (
+$dbi->model(
   table =>'book',
   join => [
     'left join author on book.author_id = author.id',
@@ -81,17 +81,17 @@ $ dbi-> model (
 
 <pre>
 Insert with #insert
-$ dbi-> model ('book')-> insert ({id => 1, title =>'Perl'});
+$dbi->model('book')->insert({id => 1, title =>'Perl'});
 
 Insert multiple data with #insert
-$ dbi-> model ('book')-> insert (
+$dbi->model('book')->insert(
   [
     {id => 1, title =>'Perl'}
     {id => 2, title =>'Mojolicious'}
   ]
 );
 Insert multiple data with #insert (bulk insert)
-$ dbi-> model ('book')-> insert (
+$dbi->model('book')->insert(
   [
     {id => 1, title =>'Perl'}
     {id => 2, title =>'Mojolicious'}
@@ -104,92 +104,92 @@ $ dbi-> model ('book')-> insert (
 
 <pre>
 Updated with #uppdate
-$ dbi-> model ('book')-> update ({title =>'Perl'}, where => {id => 1});
+$dbi->model('book')->update({title =>'Perl'}, where => {id => 1});
 </pre>
 
 <pre>
 Delete with #delete
-$ dbi-> model ('book')-> delete (where => {id => 1});
+$dbi->model('book')->delete(where => {id => 1});
 </pre>
 
 <h3> select </h3>
 
 <pre>
 Select with #select (all fields)
-my $ result = $ dbi-> model ('book')-> select (where => {id => 1});
+my $result = $dbi->model('book')->select(where => {id => 1});
 
 Select with #select (specify field)
-my $ result = $ dbi-> model ('book')-> select (['id','title'], where => {id => 1});
+my $result = $dbi->model('book')->select(['id','title'], where => {id => 1});
 
 Select with #select (ID is 1 or 2 or 3)
-my $ result = $ dbi-> model ('book')-> select (where => {id => [1, 2, 3]});
+my $result = $dbi->model('book')->select(where => {id => [1, 2, 3]});
 
 Select with #select (Peller is included in the title and the price is 2000 yen or less)
-my $ result = $ dbi-> model ('book')-> select (
-  where => "title like'% Perl%' and price <= 2000"
+my $result = $dbi->model('book')->select(
+  where => "title like'%Perl%' and price <= 2000"
 );
 
 Select with #select (Perl is included in the title and the price is 2000 yen or less) When using variables
 # Use named placeholder
-my $ title ='Perl';
-my $ price = 2000;
-my $ result = $ dbi-> model ('book')-> select (
+my $title ='Perl';
+my $price = 2000;
+my $result = $dbi->model('book')->select(
   where => [
     "title like: title and price <=: price",
-    {title => $ title, price => $ price}
+    {title => $title, price => $price}
   ]
 );
 
 Select with #select (Peller is included in the title and the price is 2000 yen or less)
 #where clause dynamically generated
-my $ title ='Perl';
-my $ price = 2000;
-my $ result = $ dbi-> model ('book')-> select (
+my $title ='Perl';
+my $price = 2000;
+my $result = $dbi->model('book')->select(
   where => [
     ['and', "title like: title", "price <=: price"],
-    {title => $ title, price => $ price}
+    {title => $title, price => $price}
   ]
 );
 
 Select with #select (Peller is included in the title and the price is 2000 yen or less or 5000 yen or more)
 #Where clause is dynamically generated and multiple conditions are specified with or
-my $ title ='Perl';
-my $ price1 = 2000;
-my $ price2 = 5000;
-my $ result = $ dbi-> model ('book')-> select (
+my $title ='Perl';
+my $price1 = 2000;
+my $price2 = 5000;
+my $result = $dbi->model('book')->select(
   where => [
     ['and', "title like: title", ['or', "price <=: price", "price> =: price"],
-    {title => $ title, price => [$ price1, $ price2]}
+    {title => $title, price => [$price1, $price2]}
   ]
 );
 Select with #select (Peller is included in the title and the price is 2000 yen or less or 5000 yen or more)
 #Where clause is dynamically generated and multiple conditions are specified with or
 # One price was not specified
-my $ title ='Perl';
-my $ price2 = 5000;
-my $ result = $ dbi-> model ('book')-> select (
+my $title ='Perl';
+my $price2 = 5000;
+my $result = $dbi->model('book')->select(
   where => [
     ['and', "title like: title", ['or', "price <=: price", "price> =: price"],
-    {title => $ title, price => [$ dbi-> not_exists, $ price2]}
+    {title => $title, price => [$dbi->not_exists, $price2]}
   ]
 );
 
 Select with #select (Perl is included in the title and the price is 2000 yen or less) When using variables
 # Named Placeholder Syntack Sugar
-my $ title ='Perl';
-my $ price = 2000;
-my $ result = $ dbi-> model ('book')-> select (
+my $title ='Perl';
+my $price = 2000;
+my $result = $dbi->model('book')->select(
   where => [
     ": title {like} and: price {<=}",
-    {title => $ title, price => $ price}
+    {title => $title, price => $price}
   ]
 );
 
 </pre>
 
-<h2> Explanation of DBIx :: Custom </h2>
+<h2> Explanation of DBIx::Custom </h2>
 
-This is a commentary article on DBIx :: Custom.
+This is a commentary article on DBIx::Custom.
 
 <ul>
   <li> <a href="/blog/20110508130736.html"> Installation</a> </li>
@@ -205,7 +205,7 @@ This is a commentary article on DBIx :: Custom.
   <li> <a href="/blog/20200127081842.html"> Other features</a> </li>
 </ul>
 
-<h3> All DBIx :: Custom articles </h3>
+<h3> All DBIx::Custom articles </h3>
 
 <ul>
   <li> <a href="/list.html"> All articles</a> </li>

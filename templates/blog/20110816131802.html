@@ -2,73 +2,73 @@
   <ul itemscope itemtype = "http://schema.org/BreadcrumbList">
     <li itemprop = "itemListElement" itemscope itemtype = "http://schema.org/ListItem">
       <a itemprop="item" href="/">
-        <span itemprop = "name"> DBIx :: Custom </ span>
-      </a>
+        <span itemprop = "name"> DBIx::Custom </span>
+     </a>
       <meta itemprop = "position" content = "1" />
-    </ li>
+    </li>
     <li>
       here
-    </ li>
-  </ ul>
-</ div>
+    </li>
+  </ul>
+</div>
 
-<h2> Creating a model </ h2>
+<h2> Creating a model </h2>
 
-I will explain how to use "model" with DBIx :: Custom. When you create a model, you can automatically acquire and utilize the field information of the table, and you can define a join clause.
+I will explain how to use "model" with DBIx::Custom. When you create a model, you can automatically acquire and utilize the field information of the table, and you can define a join clause.
 
-<h3> Create model --create_model </ h3>
+<h3> Create model --create_model </h3>
 
-Use the <strong> create_model </ strong> method to create a model.
+Use the <strong> create_model </strong> method to create a model.
 
 <pre>
 #Create a model by specifying the table name
-$ dbi-> create_model ('book');
+$dbi->create_model('book');
 
 #Create a model with a table name and join clause
-$ dbi-> create_model (
+$dbi->create_model(
   table =>'book',
   join => [
     'left join company on book.company_id = company.id',
     'left join author on book.author_id = author.id',
   ],,
 );
-</ pre>
+</pre>
     
-In the argument of create_model, you can specify the table name with <b> table </ b> and the join clause with <b> join </ b>. You can also specify multiple join clauses for join.
+In the argument of create_model, you can specify the table name with <b> table </b> and the join clause with <b> join </b>. You can also specify multiple join clauses for join.
 
 In this sample, join joins the company table and the author table.
 
-<h3> Get the model </ h3>
+<h3> Get the model </h3>
 
-The created model can be obtained by specifying the table name with the <b> model </ b> method.
+The created model can be obtained by specifying the table name with the <b> model </b> method.
 
 <pre>
-my $ book = $ dbi-> model ('book');
-</ pre>
+my $book = $dbi->model('book');
+</pre>
 
-When you create a model, the method <a href="/blog/20110129130016.html"> insert </a>, <a href="/blog/20110130130016.html"> update </ strong> of DBIx :: Custom :: Model You can call a>, <a href="/blog/20110202130016.html"!> Delete </a>, <a href="/blog/20110210130016.html"> select </a> and so on.
+When you create a model, the method <a href="/blog/20110129130016.html"> insert</a>, <a href="/blog/20110130130016.html"> update </strong> of DBIx::Custom::Model You can call a>, <a href="/blog/20110202130016.html"!> Delete</a>, <a href="/blog/20110210130016.html"> select</a> and so on.
 
 <pre>
 #insert
-$ dbi-> model ('book')-> insert ({id => 1, title =>'Perl'});
+$dbi->model('book')->insert({id => 1, title =>'Perl'});
 
 #uppdate
-$ dbi-> model ('book')-> update ({title =>'Perl'}, where => {id => 1});
+$dbi->model('book')->update({title =>'Perl'}, where => {id => 1});
 
 #uppdate_all
-$ dbi-> model ('book')-> update_all ({title =>'Perl'});
+$dbi->model('book')->update_all({title =>'Perl'});
 
 #delete
-$ dbi-> model ('book')-> delete (where => {id => 1});
+$dbi->model('book')->delete(where => {id => 1});
 
 #delete_all
-$ dbi-> model ('book')-> delete_all;
+$dbi->model('book')->delete_all;
 
 #select
-my $ rows = $ dbi-> model ('book')-> select (where => {id => 1})-> all;
-</ pre>
+my $rows = $dbi->model('book')->select(where => {id => 1})->all;
+</pre>
 
-<h3> Combination of join clause and field name acquisition </ h3>
+<h3> Combination of join clause and field name acquisition </h3>
 
 You can get the field name automatically by using the model. For example, join the company table with a book table to get information.
 
@@ -77,8 +77,8 @@ For example, consider the following case: In the following example, the SQL is e
 <pre>
 # Get all columns
 #select * from book where id =?
-my $ rows = $ dbi-> model ('book')-> select (where => {id => 1})-> all;
-</ pre>
+my $rows = $dbi->model('book')->select(where => {id => 1})->all;
+</pre>
 
 Now, if you want to get an additional company name from here. In such a case, it is easy to write by defining a model. Get all the columns in the book and add the company name.
 
@@ -87,14 +87,14 @@ Now, if you want to get an additional company name from here. In such a case, it
 #select book.id as `id`, book.name as` name`, book.company_id as `company_id`, company.name as` company.name`
 # from book left join company on book.company_id = company.id
 # where id =?
-my $ rows = $ dbi-> model ('book')-> select (
+my $rows = $dbi->model('book')->select(
   [
     {__MY__ =>'*'},
     {company => ['name']}
   ],,
   where => {id => 1}
-)-> all;
-</ pre>
+)->all;
+</pre>
 
 The table name "__MY__" means your own table name and will get the name without the prefix of the table name. You can get all fields with "*".
 
@@ -109,13 +109,13 @@ You can also specify the field name with the table prefix book.
 #select book.id as `book.id`, book.name as` book.name`, company.name as `company.name`
 # from book left join company on book.company_id = company.id
 # where id =?
-my $ rows = $ dbi-> model ('book')-> select (
+my $rows = $dbi->model('book')->select(
   [
     {book => ['id','name']},
     {company => ['name']}
   ],,
   where => {id => 1}
-)-> all;
-</ pre>
+)->all;
+</pre>
 
 Once you've created a model, you can join the tables and get the fields in a short description.

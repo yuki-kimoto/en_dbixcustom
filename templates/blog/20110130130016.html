@@ -2,33 +2,33 @@
   <ul itemscope itemtype = "http://schema.org/BreadcrumbList">
     <li itemprop = "itemListElement" itemscope itemtype = "http://schema.org/ListItem">
       <a itemprop="item" href="/">
-        <span itemprop = "name"> DBIx :: Custom </ span>
-      </a>
+        <span itemprop = "name"> DBIx::Custom </span>
+     </a>
       <meta itemprop = "position" content = "1" />
-    </ li>
+    </li>
     <li>
       here
-    </ li>
-  </ ul>
-</ div>
+    </li>
+  </ul>
+</div>
 
-<h2> Update row with update method </ h2>
+<h2> Update row with update method </h2>
 
-Use the <strong> update </ strong> method to update the rows in the table.
+Use the <strong> update </strong> method to update the rows in the table.
 
 <pre>
-$ dbi-> update (
+$dbi->update(
   {title =>'Perl', author =>'Ken'},
   table =>'book',
   where => {id => 1},
 );
-</ pre>
+</pre>
 
-In the first argument, specify the data for update as a hash reference. Specify the target table with <strong> table </ strong>. Specify the condition of the row to be updated with <strong> where </ strong>. Where can be a hash reference or a DBIx :: Custom :: Where object. The following SQL is issued:
+In the first argument, specify the data for update as a hash reference. Specify the target table with <strong> table </strong>. Specify the condition of the row to be updated with <strong> where </strong>. Where can be a hash reference or a DBIx::Custom::Where object. The following SQL is issued:
 
 <pre>
 update book set title =?, author =? where id =?;
-</ pre>
+</pre>
 
 The corresponding value is embedded in the placeholder.
 
@@ -36,75 +36,75 @@ If you pass a scalar reference as a value, you can embed it in SQL as it is.
 
 <pre>
 {date => \ "NOW ()"}
-</ pre>
+</pre>
 
-<h3> update method options </ h3>
+<h3> update method options </h3>
 
-The update method can use all the options of the "execute" method, and the following new options are available. For the execute option, refer to the option item of "<a href="/blog/20110708131364.html"> execute method </a>".
+The update method can use all the options of the "execute" method, and the following new options are available. For the execute option, refer to the option item of "<a href="/blog/20110708131364.html"> execute method</a>".
 
-<h4> Condition specification by ID id </ h4>
+<h4> Condition specification by ID id </h4>
 
 Use the id option to specify conditions by ID. The primary_key option must be specified.
 
 <pre>
 id => 4
 id => [4, 5]
-</ pre>
+</pre>
 
 For example, suppose you execute the following update statement.
 
 <pre>
-$ dbi-> update (
+$dbi->update(
   {title =>'Perl', author =>'Ken'}
   primary_key => ['id1','id2'],
   id => [4, 5],
   table =>'book'
 );
-</ pre>
+</pre>
 
 This has the same meaning as the update statement below.
 
 <pre>
-$ dbi-> update (
+$dbi->update(
   {title =>'Perl', author =>'Ken'}
   where => {id1 => 4, id2 => 5},
   table =>'book'
 );
-</ pre>
+</pre>
 
-<h4> prefix prefix </ h4>
+<h4> prefix prefix </h4>
 
 You can add a string between update and the table name.
 
 <pre>
 prefix =>'or replace'
-</ pre>
+</pre>
 
 For example, you can execute the following SQL statement.
 
 <pre>
 update or replace book
-</ pre>
+</pre>
 
-<h4> table name table </ h4>
+<h4> table name table </h4>
 
 Specify the table name with the table option.
 
 <pre>
 table =>'book'
-</ pre>
+</pre>
 
-<h4> Set the current time when updating mtime </ h4>
+<h4> Set the current time when updating mtime </h4>
 
 To update the update time at update time, specify the column name to store the update time with the mtime option.
 
 <pre>
 mtime =>'modified_time'
-</ pre>
+</pre>
 
 The default format is "YYYY-mm-dd HH: MM: SS". This can be changed with the now attribute.
 
-<h4> Where clause where </ h4>
+<h4> Where clause where </h4>
 
 Use the where option to write a Where clause.
 
@@ -112,49 +112,49 @@ Use the where option to write a Where clause.
 where => {author =>'Ken','title' =>'Perl'}
 where => [
   ['and',': author {=}',': title {like}'],
-  {author =>'Ken', title =>'% Perl%'}
+  {author =>'Ken', title =>'%Perl%'}
 ]
-</ pre>
+</pre>
 
-See the where option in "<a href="/blog/20110210130016.html"> select method </a>" for how to specify the where option. See <a href="/blog/20110924132031.html"> Dynamic Where Clause Generation </a> for more information on Where clause generation.
+See the where option in "<a href="/blog/20110210130016.html"> select method</a>" for how to specify the where option. See <a href="/blog/20110924132031.html"> Dynamic Where Clause Generation</a> for more information on Where clause generation.
 
-<h4> Placeholder wrapping wrap </ h4>
+<h4> Placeholder wrapping wrap </h4>
 
 If you want to edit the placeholder part of the set part of the update statement, use the wrap option.
 
 <pre>
-wrap => {price => sub {"max ($ _ [0])"}}
-</ pre>
+wrap => {price => sub {"max ($_ [0])"}}
+</pre>
 
 For example, suppose you execute the following update.
 
 <pre>
-$ dbi-> update (
+$dbi->update(
   {price => 100},
   table =>'book',
   where => {id => 1}
-  wrap => {price => sub {"$ _ [0] + 5"}}
+  wrap => {price => sub {"$_ [0] + 5"}}
 );
-</ pre>
+</pre>
 
 The following SQL is executed.
 
 <pre>
 update book set price =? + 5 where id = 1
-</ pre>
+</pre>
 
-<h3> Update all rows update_all </ h3>
+<h3> Update all rows update_all </h3>
 
-Use the <strong> update_all </ strong> method to update all the rows in the table. For your safety, the update method doesn't allow all updates to the row, so use the update_all method instead.
+Use the <strong> update_all </strong> method to update all the rows in the table. For your safety, the update method doesn't allow all updates to the row, so use the update_all method instead.
 
 <pre>
-$ dbi-> update_all ({title =>'Perl', author =>'Ken'}, table =>'book');
-</ pre>
+$dbi->update_all({title =>'Perl', author =>'Ken'}, table =>'book');
+</pre>
 
-Specify the data for update in the first argument as a hash reference. Specify the target table with <strong> table </ strong>. The following SQL is issued:
+Specify the data for update in the first argument as a hash reference. Specify the target table with <strong> table </strong>. The following SQL is issued:
 
 <pre>
 update book set title =?, author =?;
-</ pre>
+</pre>
 
 The corresponding value is embedded in the placeholder.

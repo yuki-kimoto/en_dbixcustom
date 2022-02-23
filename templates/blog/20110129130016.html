@@ -2,156 +2,156 @@
   <ul itemscope itemtype = "http://schema.org/BreadcrumbList">
     <li itemprop = "itemListElement" itemscope itemtype = "http://schema.org/ListItem">
       <a itemprop="item" href="/">
-        <span itemprop = "name"> DBIx :: Custom </ span>
-      </a>
+        <span itemprop = "name"> DBIx::Custom </span>
+     </a>
       <meta itemprop = "position" content = "1" />
-    </ li>
+    </li>
     <li>
       here
-    </ li>
-  </ ul>
-</ div>
+    </li>
+  </ul>
+</div>
 
-<h2> Insert a row with the insert method </ h2>
+<h2> Insert a row with the insert method </h2>
 
-Use the <strong> insert </ strong> method to insert a row into the table.
+Use the <strong> insert </strong> method to insert a row into the table.
 
 <pre>
-$ dbi-> insert ({id => 1, title =>'Perl'}, table =>'book');
-</ pre>
+$dbi->insert({id => 1, title =>'Perl'}, table =>'book');
+</pre>
 
-In the first argument, specify the data you want to insert with a hash reference. Specify the target table with <strong> table </ strong>. The following SQL is issued:
+In the first argument, specify the data you want to insert with a hash reference. Specify the target table with <strong> table </strong>. The following SQL is issued:
 
 <pre>
 insert into book (id, title) values ​​(?,?);
-</ pre>
+</pre>
 
 The corresponding value is embedded in the placeholder.
 
-<h3> Insert constant </ h3>
+<h3> Insert constant </h3>
 
 If you want to embed constants in parameters instead of placeholders, you can specify a scalar reference.
 
 <pre>
-$ dbi-> insert ({id => 1, ctime => \ "now ()"}, table =>'book');
-</ pre>
+$dbi->insert({id => 1, ctime => \ "now ()"}, table =>'book');
+</pre>
 
 The following SQL is executed:
 
 <pre>
 insert into book (id, ctime) values ​​(?, now ());
-</ pre>
+</pre>
 
-<h3> insert method options </ h3>
+<h3> insert method options </h3>
 
-The insert method has all the options of the execute method. For the options, refer to the option item of "<a href="/blog/20110708131364.html"> execute method </a>".
+The insert method has all the options of the execute method. For the options, refer to the option item of "<a href="/blog/20110708131364.html"> execute method</a>".
 
 In addition, you can use the following options:
 
-<h4> Setting the current time at the time of insertion (generation time) ctime </ h4>
+<h4> Setting the current time at the time of insertion (generation time) ctime </h4>
 
 Use the ctime option to set the current time for the specified column when you perform an insert.
 
 <pre>
 ctime =>'created_time'
-</ pre>
+</pre>
 
 The default format is "YYYY-mm-dd HH: MM: SS". You can change this by setting the now attribute.
 
-<h4> ID specification id </ h4>
+<h4> ID specification id </h4>
 
 You can specify the id in the same way as the execute method. The primary_key must be set.
 
 <pre>
 id => 4
 id => [4, 5]
-</ pre>
+</pre>
 
 The data to be inserted is created using the column name set in primary_key.
 
 <pre>
-$ dbi-> insert (
+$dbi->insert(
   {title =>'Perl', author =>'Ken'}
   primary_key => ['id1','id2'],
   id => [4, 5],
   table =>'book'
 );
-</ pre>
+</pre>
 
 It has the same meaning as the following insert statement.
 
 <pre>
-$ dbi-> insert (
+$dbi->insert(
   {id1 => 4, id2 => 5, title =>'Perl', author =>'Ken'},
   table =>'book'
 );
-</ pre>
+</pre>
 
-<h4> prefix prefix </ h4>
+<h4> prefix prefix </h4>
 
 You can use the prefix option to add any string between "insert" and "into table name" in the insert statement.
 
 <pre>
 prefix =>'or replace'
-</ pre>
+</pre>
 
 The following SQL will be created.
 <pre>
 insert or replace into book
-</ pre>
+</pre>
 
-<h4> table name table </ h4>
+<h4> table name table </h4>
 
 Specify the table name with the table option. The table name is required.
 
 <pre>
 table =>'book'
-</ pre>
+</pre>
 
-<h4> Setting the current time at the time of insertion (update time) mtime </ h4>
+<h4> Setting the current time at the time of insertion (update time) mtime </h4>
 
 This option is the same as the mtime option of the update method. You can set the current time for the specified line. This time can be changed with the now attribute.
 
 <pre>
 mtime =>'modified_time'
-</ pre>
+</pre>
 
 If you insert it, it is also the first modification time, so the same current time is inserted in both the column set in ctime and the column set in mtime.
 
-<h4> Placeholder wrapping wrap </ h4>
+<h4> Placeholder wrapping wrap </h4>
 
 If you use a database function in the values ​​part of insert, you can solve it by using the wrap option. The placeholder part will be converted with the specified code reference.
 
 <pre>
-wrap => {price => sub {"$ _ [0] + 5"}}
-</ pre>
+wrap => {price => sub {"$_ [0] + 5"}}
+</pre>
 
 Suppose you execute an insert statement like the one below.
 
 <pre>
-$ dbi-> insert (
+$dbi->insert(
   {id => 1, price => 100},
   table =>'book',
-  wrap => {price => sub {"$ _ [0] + 5"}}
+  wrap => {price => sub {"$_ [0] + 5"}}
 );
-</ pre>
+</pre>
 
 Then the placeholder part of price will be replaced using the code reference specified by wrap.
 
 <pre>
 insert into book (id, price) values ​​(?,? + 5);
-</ pre>
+</pre>
 
-<h3> How to "speed up" "massive inserts" </ h3>
+<h3> How to "speed up" "massive inserts" </h3>
 
-DBIx :: Custom is a convenient wrapper for DBI, but its performance is significantly worse than raw DBI when it comes to performance when doing a lot of inserts etc. in succession.
+DBIx::Custom is a convenient wrapper for DBI, but its performance is significantly worse than raw DBI when it comes to performance when doing a lot of inserts etc. in succession.
 
-In such a case, insert multiple data at once. You can pass multiple data to the insert method of DBIx :: Custom at once.
+In such a case, insert multiple data at once. You can pass multiple data to the insert method of DBIx::Custom at once.
 
 <pre>
 my @params = [{id => 1, title =>'Perl'}, {id => 2, title =>'Ruby'}];
-$ dbi-> insert (\ @ params, table =>'book');
-</ pre>
+$dbi->insert(\ @params, table =>'book');
+</pre>
 
 The performance degradation when doing a large number of inserts is small compared to DBI.
 
@@ -166,62 +166,62 @@ use strict;
 use warnings;
 use Benchmark qw / timethese cmpthese /;
 
-use DBIx :: Custom;
-my $ dbi = DBIx :: Custom-> connect (
+use DBIx::Custom;
+my $dbi = DBIx::Custom->connect(
   dsn =>'dbi: SQLite: dbname =: memory:',
 );
 
-$ dbi-> execute ("create table book (id, title)");
+$dbi->execute("create table book (id, title)");
 
 # Performance comparison
-my $ result = timethese (100, {
+my $result = timethese (100, {
   # Normal
   normal => sub {
-    for my $ i (1 .. 100) {
-      my $ param = {id => $ i, title =>'Perl'};
-      $ dbi-> insert ($ param, table =>'book');
+    for my $i (1 .. 100) {
+      my $param = {id => $i, title =>'Perl'};
+      $dbi->insert($param, table =>'book');
     }
   },
   #Multiple inserts at once
   multiple => sub {
     my @params;
-    for my $ i (1 .. 100) {
-      push @params, {id => $ i, title =>'Perl'};
+    for my $i (1 .. 100) {
+      push @params, {id => $i, title =>'Perl'};
     }
-    $ dbi-> insert (\ @ params, table =>'book');
+    $dbi->insert(\ @params, table =>'book');
   },
     #Reuse statement handles in raw DBI
     raw => sub {
-      my $ sth;
-      for my $ i (1 .. 100) {
-        $ sth || = $ dbi-> dbh-> prepare ('insert into book (id, title) values ​​(?,?)');
-        my $ id = $ i;
-        my $ title ='Perl';
-        $ sth-> execute ($ i, $ title);
+      my $sth;
+      for my $i (1 .. 100) {
+        $sth || = $dbi->dbh->prepare('insert into book (id, title) values ​​(?,?)');
+        my $id = $i;
+        my $title ='Perl';
+        $sth->execute($i, $title);
       }
     }
 });
-cmpthese ($ result);
-</ pre>
+cmpthese ($result);
+</pre>
 
 Benchmark results are slightly lower than those using raw DBI. Compared to using a normal insert, there is a difference of nearly 10 times, so I think it is better to use it when performing a large number of inserts at the same time.
 
 <pre>
            Rate normal multiple raw
-normal 22.3 / s --- 90% -92%
-multiple 213 / s 855% ---23%
-raw 278 / s 1147% 31% -
-</ pre>
+normal 22.3 / s --- 90%-92%
+multiple 213 / s 855%---23%
+raw 278 / s 1147%31%-
+</pre>
 
-<h4> Speed ​​up with bulk insert </ h4>
+<h4> Speed ​​up with bulk insert </h4>
 
 If your database supports bulk inserts, you can do bulk inserts. Currently available for MySQL and PostgreSQL. You can use the database function to insert multiple data at once, so you can expect even higher speeds.
 
 <pre>
-$ dbi-> insert ($ params, table =>'book', bulk_insert => 1);
-</ pre>
+$dbi->insert($params, table =>'book', bulk_insert => 1);
+</pre>
 
-<b> Benchmark with bulk_insert in MySQL </ b>
+<b> Benchmark with bulk_insert in MySQL </b>
 
 Below is the benchmark script.
 
@@ -230,67 +230,67 @@ use strict;
 use warnings;
 use Benchmark qw / timethese cmpthese /;
 
-use DBIx :: Custom;
+use DBIx::Custom;
 
-my $ dbi = DBIx :: Custom-> connect (dsn =>'dbi: mysql: database = usertest',
+my $dbi = DBIx::Custom->connect(dsn =>'dbi: mysql: database = usertest',
 user =>'root',connector => 1);
 
 # Performance comparison
-my $ result = timethese (100, {
+my $result = timethese (100, {
   normal => sub {
-    $ dbi-> connector-> txn (sub {
-      $ dbi-> delete_all (table =>'book');
-      for my $ i (1 .. 100) {
-        my $ param = {id => $ i, title =>'Perl'};
-        $ dbi-> insert ($ param, table =>'book');
+    $dbi->connector->txn(sub {
+      $dbi->delete_all(table =>'book');
+      for my $i (1 .. 100) {
+        my $param = {id => $i, title =>'Perl'};
+        $dbi->insert($param, table =>'book');
       }
     });
   },
   multiple => sub {
-    $ dbi-> connector-> txn (sub {
-      $ dbi-> delete_all (table =>'book');
+    $dbi->connector->txn(sub {
+      $dbi->delete_all(table =>'book');
       my @params;
-      for my $ i (1 .. 100) {
-        push @params, {id => $ i, title =>'Perl'};
+      for my $i (1 .. 100) {
+        push @params, {id => $i, title =>'Perl'};
       }
-      $ dbi-> insert (\ @ params, table =>'book');
+      $dbi->insert(\ @params, table =>'book');
     });
   },
   bulk_insert => sub {
-    $ dbi-> connector-> txn (sub {
-      $ dbi-> delete_all (table =>'book');
+    $dbi->connector->txn(sub {
+      $dbi->delete_all(table =>'book');
       my @params;
-      for my $ i (1 .. 100) {
-        push @params, {id => $ i, title =>'Perl'};
+      for my $i (1 .. 100) {
+        push @params, {id => $i, title =>'Perl'};
       }
-      $ dbi-> insert (\ @params, table =>'book', bulk_insert => 1);
+      $dbi->insert(\ @params, table =>'book', bulk_insert => 1);
     });
   },
   raw => sub {
-    $ dbi-> connector-> txn (sub {
-      $ dbi-> delete_all (table =>'book');
-      my $ sth;
-      for my $ i (1 .. 100) {
-        $ sth || = $ dbi-> dbh-> prepare ('insert into book (id, title) values ​​(?,?)');
-        my $ id = $ i;
-        my $ title ='Perl';
-        $ sth-> execute ($ i, $ title);
+    $dbi->connector->txn(sub {
+      $dbi->delete_all(table =>'book');
+      my $sth;
+      for my $i (1 .. 100) {
+        $sth || = $dbi->dbh->prepare('insert into book (id, title) values ​​(?,?)');
+        my $id = $i;
+        my $title ='Perl';
+        $sth->execute($i, $title);
       }
     });
   }
 });
 
-cmpthese ($ result);
-</ pre>
+cmpthese ($result);
+</pre>
 
 Benchmark results show that using bulk_insert gives about 5 times the normal performance of a normal insert.
 
 <pre>
               Rate normal multiple raw bulk_insert
-normal 24.0 / s --- 72% -76% -83%
-multiple 86.2 / s 259% ---16% -40%
-raw 102 / s 326% 18% --- 29%
-bulk_insert 143 / s 496% 66% 40% -
-</ pre>
+normal 24.0 / s --- 72%-76%-83%
+multiple 86.2 / s 259%---16%-40%
+raw 102 / s 326%18%--- 29%
+bulk_insert 143 / s 496%66%40%-
+</pre>
 
 If bulk inserts do not perform well, check once to see if there is enough memory space for database inserts. If this memory area is not enough, swap-in / swap-out will occur and it will be very slow.

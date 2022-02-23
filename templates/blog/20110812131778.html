@@ -2,150 +2,150 @@
   <ul itemscope itemtype = "http://schema.org/BreadcrumbList">
     <li itemprop = "itemListElement" itemscope itemtype = "http://schema.org/ListItem">
       <a itemprop="item" href="/">
-        <span itemprop = "name"> DBIx :: Custom </ span>
-      </a>
+        <span itemprop = "name"> DBIx::Custom </span>
+     </a>
       <meta itemprop = "position" content = "1" />
-    </ li>
+    </li>
     <li>
       here
-    </ li>
-  </ ul>
-</ div>
+    </li>
+  </ul>
+</div>
 
-<h2> Generate SQL </ h2>
+<h2> Generate SQL </h2>
 
-Introducing the method to "generate SQL" with DBIx :: Custom.
+Introducing the method to "generate SQL" with DBIx::Custom.
 
-<h3> Easily generate column names for use in select statements --column </ h3>
+<h3> Easily generate column names for use in select statements --column </h3>
 
-Use the <strong> column </ strong> method to easily generate the column name part used in the select statement.
+Use the <strong> column </strong> method to easily generate the column name part used in the select statement.
 
 <pre>
-my $ column = $ dbi-> column (book => [qw / author title /]);
-</ pre>
+my $column = $dbi->column(book => [qw / author title /]);
+</pre>
 
 A column name similar to the following is generated.
 
 <pre>
 "book". "author" as "book.author", "book". "title" as "book.title"
-</ pre>
+</pre>
 
 The column method helps to write less duplication.
 
 You can also change the delimiter used in the column name alias.
 
 <pre>
-$ dbi-> separator ('-');
-</ pre>
+$dbi->separator('-');
+</pre>
 
 If you change the delimiter to "-", the following column name will be generated.
 
 <pre>
 "book". "author" as "book-author", "book". "title" as "book-title"
-</ pre>
+</pre>
 
-<h3> Use column in select method </ h3>
+<h3> Use column in select method </h3>
 
 You can use the column method in the column option of the select method.
 
 <pre>
-my $ result = $ dbi-> select (
+my $result = $dbi->select(
   table =>'book',
   column => [
-    $ dbi-> column (book => [qw / title author /])
+    $dbi->column(book => [qw / title author /])
   ]
 );
-</ pre>
+</pre>
 
 However, it is troublesome to write a column, so using a hash reference has the same meaning as using the column method, so it is better to use this.
 
 <pre>
-my $ result = $ dbi-> select (
+my $result = $dbi->select(
   table =>'book',
   column => [
     {book => [qw / title author /]}
   ]
 );
-</ pre>
+</pre>
 
-<h3> Generate unqualified column name for table name --mycolumn </ h3>
+<h3> Generate unqualified column name for table name --mycolumn </h3>
 
-The <strong> mycolumn </ strong> method makes it easy to generate unqualified column names for table names.
+The <strong> mycolumn </strong> method makes it easy to generate unqualified column names for table names.
 
 <pre>
-my $ mycolumn = $ dbi-> mycolumn (book => ['author','title']);
-</ pre>
+my $mycolumn = $dbi->mycolumn(book => ['author','title']);
+</pre>
 
 A column name similar to the following is generated.
 
 <pre>
 book.author as author,
 book.title as title
-</ pre>
+</pre>
 
 This is supposed to be used in the column option of the select method.
 
 <pre>
-$ dbi-> select (column => [
-  $ dbi-> mycolumn (book => ['author','title'])
+$dbi->select(column => [
+  $dbi->mycolumn(book => ['author','title'])
 ]);
-</ pre>
+</pre>
 
-<h3> Dynamically generate the values ​​part in the insert statement --values_clause </ h3>
+<h3> Dynamically generate the values ​​part in the insert statement --values_clause </h3>
 
-Use the <strong> values_clause </ strong> method to dynamically generate the values ​​part of the insert.
+Use the <strong> values_clause </strong> method to dynamically generate the values ​​part of the insert.
 
 <pre>
-my $ values_clause = $ dbi-> values_clause ({title =>'a', age => 2});
-</ pre>
+my $values_clause = $dbi->values_clause({title =>'a', age => 2});
+</pre>
 
 This will be a string like this:
 
 <pre>
 (title, author) values ​​(title =: title, age =: age);
-</ pre>
+</pre>
 
 It can be used to create an insert statement.
 
 <pre>
-my $ insert_sql = "insert into book $ values_clause";
-</ pre>
+my $insert_sql = "insert into book $values_clause";
+</pre>
 
-<h3> Dynamically generate the part to assign the value in the update statement --assign_clause </ h3>
+<h3> Dynamically generate the part to assign the value in the update statement --assign_clause </h3>
 
-Use the <strong> assign_clause </ strong> method to dynamically generate the part to which the value is assigned in the update statement.
+Use the <strong> assign_clause </strong> method to dynamically generate the part to which the value is assigned in the update statement.
 
 <pre>
-my $ param = {id => 1, title =>'Perl'};
-my $ assign_clause = $ dbi-> assign_clause ($ param);
-</ pre>
+my $param = {id => 1, title =>'Perl'};
+my $assign_clause = $dbi->assign_clause($param);
+</pre>
 
 It will be expanded as follows.
 
 <pre>
 id =: id, title =: title
-</ pre>
+</pre>
 
 You can create an update statement as follows:
 
 <pre>
-my $ update_sql = "update book set $ assign_clause";
-</ pre>
+my $update_sql = "update book set $assign_clause";
+</pre>
 
 The SQL created in this way can be executed by the execute method.
 
 <pre>
-$ dbi-> execute ($ update_sql, $ param);
-</ pre>
+$dbi->execute($update_sql, $param);
+</pre>
 
-<h3> Change quotes for reserved words --quote </ h3>
+<h3> Change quotes for reserved words --quote </h3>
 
-Use the <strong> quote </ strong> method to change the quotes for reserved words.
+Use the <strong> quote </strong> method to change the quotes for reserved words.
 
 <pre>
-$ dbi-> quote ('"');
-$ dbi-> quote ('[]');
-</ pre>
+$dbi->quote('"');
+$dbi->quote('[]');
+</pre>
 
 Quoting can be set with a single character or as a pair.
 
@@ -159,109 +159,109 @@ Connection via ODBC
 (Assuming Microsoft SQL Server and Access) []
 
 other than that                              "
-</ pre>
+</pre>
 
 Table names and column names are automatically quoted using the quote value.
 
 For example, in MySQL, select like below
 
 <pre>
-$ dbi-> select (
+$dbi->select(
   table =>'book',
   column => [
     {book => ['author']}
   ]
 );
-</ pre>
+</pre>
 
 When you execute, the following SQL is executed.
 
 <pre>
 select book.author as `book.author` from` book`;
-</ pre>
+</pre>
 
-<h3> Change table name and column name delimiter --separator / DBIx :: Custom </ h3>
+<h3> Change table name and column name delimiter --separator / DBIx::Custom </h3>
 
-Use the <strong> separator </ strong> method to change the table and column name delimiters.
+Use the <strong> separator </strong> method to change the table and column name delimiters.
 
 <pre>
-$ dbi-> separator ('-');
-</ pre>
+$dbi->separator('-');
+</pre>
 
 The default delimiter is ".".
 
-<h4> Impact on column method </ h4>
+<h4> Impact on column method </h4>
 
 The character specified in separator is used as an alias for the column name in the string returned by the column method.
 
 In the case of column method, it will be as follows.
 
 <pre>
-my $ column = $ dbi-> column (book => [qw / title author /]);
-</ pre>
+my $column = $dbi->column(book => [qw / title author /]);
+</pre>
 
 The alias of the column name included in the return string will be something like "table name-column name".
 
 <pre>
 "book". "title" as "book-title", "book". "author" as "book-author"
-</ pre>
+</pre>
 
-<h4> Impact on column option of select method </ h4>
+<h4> Impact on column option of select method </h4>
 
 Even when hash reference is used in the column option of select method, the character specified in separator is used as the delimiter between table name and column name.
 
 <pre>
-my $ result = $ dbi-> select (
+my $result = $dbi->select(
   table =>'book',
   column => [
     {book => [qw / title author /]}
   ]
 );
-</ pre>
+</pre>
 
 The following SQL is executed:
 
 <pre>
 select "book". "title" as "book-title", "book". "author" as "book-author" from "book"
-</ pre>
+</pre>
 
-<h4> When separator is useful </ h4>
+<h4> When separator is useful </h4>
 
 For example, it is very useful for embedding data obtained from a database in HTML. When working with the DOM, jQuery has become the de facto standard. However, with the default "." Delimiter, jQuery will not be able to handle the string correctly unless you escape the dots.
 
 If you change the delimiter to "-", you can handle it as it is, so you can use it in an affinity with HTML.
 
-<h3> generate a value for the like operator like_value </ h3>
+<h3> generate a value for the like operator like_value </h3>
 
-I think that the value when using the like operator is usually sandwiched between "%" on the left and right like "% Perl%". like_value is a function (code reference) that performs conversion to add% to the left and right.
-
-<pre>
-my $ like_value = $ dbi-> like_value-> ("Perl");
-</ pre>
-
-In this example you can get the string "% Perl%".
-
-<h3> Registration of a subroutine that generates the current time </ h3>
-
-The subroutine that generates the current time can be set with the <strong> now </ strong> attribute.
+I think that the value when using the like operator is usually sandwiched between "%" on the left and right like "%Perl%". like_value is a function (code reference) that performs conversion to add%to the left and right.
 
 <pre>
-$ dbi-> now (
+my $like_value = $dbi->like_value->("Perl");
+</pre>
+
+In this example you can get the string "%Perl%".
+
+<h3> Registration of a subroutine that generates the current time </h3>
+
+The subroutine that generates the current time can be set with the <strong> now </strong> attribute.
+
+<pre>
+$dbi->now(
   sub {
-    my ($ sec, $ min, $ hour, $ mday, $ mon, $ year) = localtime;
-    $ mon ++;
-    $ year + = 1900;
-    return sprintf ("% 04d /% 02d /% 02d% 02d:% 02d:% 02d");
+    my ($sec, $min, $hour, $mday, $mon, $year) = localtime;
+    $mon ++;
+    $year + = 1900;
+    return sprintf("%04d /%02d /%02d%02d:%02d:%02d");
   }
 );
-</ pre>
+</pre>
 
 By default, a subroutine that returns the current time in the format "2011-10-14 05:05:27" is registered.
 
 You can also use a database function to get the current time, in which case you can specify it in the scalar reference.
 
 <pre>
-$ dbi-> now (\ "now ()");
-</ pre>
+$dbi->now(\ "now ()");
+</pre>
 
 This current time is used by the ctime option and mtime option of the insert method and the mtime option of the update method.

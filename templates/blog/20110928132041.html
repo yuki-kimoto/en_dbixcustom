@@ -2,58 +2,58 @@
   <ul itemscope itemtype = "http://schema.org/BreadcrumbList">
     <li itemprop = "itemListElement" itemscope itemtype = "http://schema.org/ListItem">
       <a itemprop="item" href="/">
-        <span itemprop = "name"> DBIx :: Custom </ span>
-      </a>
+        <span itemprop = "name"> DBIx::Custom </span>
+     </a>
       <meta itemprop = "position" content = "1" />
-    </ li>
+    </li>
     <li>
       here
-    </ li>
-  </ ul>
-</ div>
+    </li>
+  </ul>
+</div>
 
-<h2> order by clause generation </ h2>
+<h2> order by clause generation </h2>
 
-The <strong> DBIx :: Custom :: Order </ strong> class makes it easy to write an order by clause. For example, you can easily specify a default order first and customize the order for your situation.
+The <strong> DBIx::Custom::Order </strong> class makes it easy to write an order by clause. For example, you can easily specify a default order first and customize the order for your situation.
 
-To create a DBIx :: Custom :: Order object, use the order method.
+To create a DBIx::Custom::Order object, use the order method.
 
 <pre>
-my $ order = $ dbi-> order;
-</ pre>
+my $order = $dbi->order;
+</pre>
 
-You can get the DBIx :: Custom :: Order object.
+You can get the DBIx::Custom::Order object.
 
 Use the prepare method to specify the order. Parts of the order by clause will be added forward and forward.
 
 <pre>
-$ order-> prepend ('title','price desc');
-$ order-> prepend ('author desc');
-</ pre>
+$order->prepend('title','price desc');
+$order->prepend('author desc');
+</pre>
 
-To finally convert to the string used in the order clause, use the to_string method or evaluate the DBIx :: Custom :: Order object as a string.
+To finally convert to the string used in the order clause, use the to_string method or evaluate the DBIx::Custom::Order object as a string.
 
 <pre>
-my $ order_str = $ order-> to_string;
-my $ order_str = "$ order";
-</ pre>
+my $order_str = $order->to_string;
+my $order_str = "$order";
+</pre>
 
 The following order clause is generated:
 
 <pre>
 order by author desc, title, price desc
-</ pre>
+</pre>
 
 Now let's prepend more on the ones that contain the column names with the same name.
 
 <pre>
-$ order-> prepend ('price asc');
-</ pre>
+$order->prepend('price asc');
+</pre>
 
-In this case, there are two prices, but the DBIx :: Custom :: Order object handles the duplicates properly. Those added later take precedence. You can see that the following order by clause is generated when it is converted to a string.
+In this case, there are two prices, but the DBIx::Custom::Order object handles the duplicates properly. Those added later take precedence. You can see that the following order by clause is generated when it is converted to a string.
 
 <pre>
 order by price asc, author desc, title
-</ pre>
+</pre>
 
-If the order is fixed, it is easy to write directly without using the DBIx :: Custom :: Order object. If you want to change the order of the order dynamically, use the DBIx :: Custom :: Order object.
+If the order is fixed, it is easy to write directly without using the DBIx::Custom::Order object. If you want to change the order of the order dynamically, use the DBIx::Custom::Order object.

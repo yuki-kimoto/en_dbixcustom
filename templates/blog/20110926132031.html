@@ -2,164 +2,164 @@
   <ul itemscope itemtype = "http://schema.org/BreadcrumbList">
     <li itemprop = "itemListElement" itemscope itemtype = "http://schema.org/ListItem">
       <a itemprop="item" href="/">
-        <span itemprop = "name"> DBIx :: Custom </ span>
-      </a>
+        <span itemprop = "name"> DBIx::Custom </span>
+     </a>
       <meta itemprop = "position" content = "1" />
-    </ li>
+    </li>
     <li>
       here
-    </ li>
-  </ ul>
-</ div>
+    </li>
+  </ul>
+</div>
 
-<h2> Filtering </ h2>
+<h2> Filtering </h2>
 
 
-I will explain how to use "filtering" with DBIx :: Custom.
+I will explain how to use "filtering" with DBIx::Custom.
 
-<h3> Filtering by column name </ h3>
+<h3> Filtering by column name </h3>
 
-DBIx :: Custom allows you to filter the value by specifying the column name. You can filter both when you send data to the database and when you retrieve it from the database.
+DBIx::Custom allows you to filter the value by specifying the column name. You can filter both when you send data to the database and when you retrieve it from the database.
 
-<h4> Filter registration </ h4>
+<h4> Filter registration </h4>
 
 It is convenient to register the filter before actually using it. If you register the filter, you can specify the filter by the filter name.
 Here, let's create a filter called Base64 that converts an image into a printable character string.
 
 <pre>
-use MIME :: Base64 qw / encode_base64 decode_base64 /;
+use MIME::Base64 qw / encode_base64 decode_base64 /;
 
-$ dbi-> register_filter (
-  encode_base64 => sub {encode_base64 ($ _ [0])},
-  decode_base64 => sub {decode_base64 ($ _ [0])}
+$dbi->register_filter(
+  encode_base64 => sub {encode_base64 ($_ [0])},
+  decode_base64 => sub {decode_base64 ($_ [0])}
 );
-</ pre>
+</pre>
 
 A filter called encode_base64 is used to convert binary data to Base64 format when inserting data into the database. A filter called decode_base64 is used to convert data from Base64 format to binary when retrieving data from the database.
 
 The filter will not be enabled just by registering it in register_filter. register_filter only provides a convenient mechanism for calling filters by name.
 
-<h4> filter option to specify a filter when sending data to the database </ h4>
+<h4> filter option to specify a filter when sending data to the database </h4>
 
 Let's specify a filter when sending data to the database.
 
 Suppose you have a table called book with columns id and image. The image is originally binary image data, but it is saved in Base64 format. You can easily write this transformation by using the filter option as follows:
 
 <pre>
-$ dbi-> insert (
-  {id => 1, image => $ image},
+$dbi->insert(
+  {id => 1, image => $image},
   table =>'book',
   filter => {image =>'encode_base64'}
 );
-</ pre>
+</pre>
 
 The database will now save the image in Base64 format. The filter option is available in the insert, update, delete, select and execute methods.
 
 In addition to the filter name, you can also directly specify a subroutine for conversion in the filter option.
 
 <pre>
-filter => {image => sub {encode_base64 ($ _ [0])}}
-</ pre>
+filter => {image => sub {encode_base64 ($_ [0])}}
+</pre>
 
 Also, if you need the same filter for multiple column names, you can use an array reference instead of a hash reference like this: Note that the outside is also an array reference, and the column name part is also an array reference.
 
 <pre>
 filter => [['image1','image2'] =>'encode_base64'}]
-</ pre>
+</pre>
 
 Internally it translates this into a hash reference, so it's a good idea to use a hash reference if you don't need it.
 
-<h4> Precautions when using id option and filter option together </ h4>
+<h4> Precautions when using id option and filter option together </h4>
 
 If you use the id option, most of it is just a number or a string, and I don't think it needs to be filtered, but here are some notes on the specifications.
 
 When using the id option in the insert method, the column name specified in the primary_key option can be used for filtering.
 
 <pre>
-$ dbi-> insert (
+$dbi->insert(
   table =>'book',
   id => 1,
   primary_key =>'book_id',
   filter => {book_id => sub {...}}
 );
-</ pre>
+</pre>
 
 Be a little careful when using the id option in the update, delete, select methods. These methods internally utilize the column names with the table names to completely distinguish the column names. Therefore, when setting the filter, it is necessary to use the name specified by primary_key with the table name qualified.
 
 <pre>
-$ dbi-> delete (
+$dbi->delete(
   table =>'book',
   id => 1,
   primary_key =>'book_id',
   filter => {'book.book_id' => sub {...}}
 );
-</ pre>
+</pre>
 
-<h4> Filtering when retrieving data from database </ h4>
+<h4> Filtering when retrieving data from database </h4>
 
-When I execute select, the return value is a DBIx :: Custom :: Result object, which has a filter attribute.
+When I execute select, the return value is a DBIx::Custom::Result object, which has a filter attribute.
 
 If you set a filter in the filter attribute, filtering will be done when fetching.
 
 <pre>
-my $ result = $ dbi-> select (...);
-$ result-> filter ({image =>'decode_base64'});
-my $ rows = $ result-> all;
-</ pre>
+my $result = $dbi->select(...);
+$result->filter({image =>'decode_base64'});
+my $rows = $result->all;
+</pre>
 
 Here, the all method is used, but filtering is performed by all methods that perform fetching, such as fetch.
 
 As with the filter option, you can specify the subroutine directly as a filter or specify an array reference.
 
 <pre>
-$ result-> filter ({image => sub {decode_base64 ($ _ [0])}});
-$ resul-> filter ([['image1','image2'] =>'decode_base64']);
-</ pre>
+$result->filter({image => sub {decode_base64 ($_ [0])}});
+$resul->filter([['image1','image2'] =>'decode_base64']);
+</pre>
 
 
-<h3> Filtering by type </ h3>
+<h3> Filtering by type </h3>
 
-DBIx :: Custom allows you to filter by type. For example, if it is a date type field, it is possible to automatically convert the date object to the date in the database.
+DBIx::Custom allows you to filter by type. For example, if it is a date type field, it is possible to automatically convert the date object to the date in the database.
 
 Due to the restrictions of RDBMS and DBI implementation, it is not so easy to realize filtering by type, but I think that it can be practically used if a few restrictions are accepted.
 
-<h4> Filter registration </ h4>
+<h4> Filter registration </h4>
 
 It is convenient to register the filter before actually using it. If you register the filter, you can specify the filter by the filter name.
-Here, let's convert the Time :: Piece object to the database date when sending the date to the database, and convert the database date to the Time :: Piece object when retrieving it. ..
+Here, let's convert the Time::Piece object to the database date when sending the date to the database, and convert the database date to the Time::Piece object when retrieving it. ..
 
 <pre>
-use Time :: Piece;
+use Time::Piece;
 
-$ dbi-> register_filter (
+$dbi->register_filter(
   tp_to_datetime => sub {
-    my $ tp = shift;
+    my $tp = shift;
     
-    return'' unless defined $ tp;
-    return $ tp unless ref $ tp;
-    return $ tp-> strftime ('% Y-% m-% d% H:% M:% S');
+    return'' unless defined $tp;
+    return $tp unless ref $tp;
+    return $tp->strftime('%Y-%m-%d%H:%M:%S');
   },
   datetime_to_tp => sub {
-    my $ datetime = shift;
+    my $datetime = shift;
     
-    return unless $ datetime;
-    return localtime (
-        Time :: Piece-> strptime ($ datetime,'% Y-% m-% d% H:% M:% S')
+    return unless $datetime;
+    return localtime(
+        Time::Piece->strptime($datetime,'%Y-%m-%d%H:%M:%S')
     )
   }
 );
-</ pre>
+</pre>
 
-A filter called tp_to_datetime converts a Time :: Piece object into a database date / time format. As for the processing contents, if undef is passed, it is converted to an empty string, if a character string that is not a Time :: Piece object is passed, it is not converted, and if it is a Time :: Piece object, the date / time of the database The process of converting to a format is performed.
+A filter called tp_to_datetime converts a Time::Piece object into a database date / time format. As for the processing contents, if undef is passed, it is converted to an empty string, if a character string that is not a Time::Piece object is passed, it is not converted, and if it is a Time::Piece object, the date / time of the database The process of converting to a format is performed.
 
-A filter called datetime_to_tp converts the date / time format of the database into a Time :: Piece object. As the processing content, if there is no data, undef is converted to a Time :: Piece object if it exists (local time) and returned.
+A filter called datetime_to_tp converts the date / time format of the database into a Time::Piece object. As the processing content, if there is no data, undef is converted to a Time::Piece object if it exists(local time) and returned.
 
-<h4> Filter settings by type type_rule </ h4>
+<h4> Filter settings by type type_rule </h4>
 
 Use the type_rule method to set the filter by type.
 
 <pre>
-$ dbi-> type_rule (
+$dbi->type_rule(
   into1 => {
     Type name => filter
   },
@@ -173,13 +173,13 @@ $ dbi-> type_rule (
     Data type => filter
   }
 );
-</ pre>
+</pre>
 
-into1 and into2 specify the filter to be executed when sending data to the database. You can specify up to two filters. The order of execution is "into1 → into2". If the filter option of the execute method exists, it will be executed in the order of "filter option-> into1-> into2".
+into1 and into2 specify the filter to be executed when sending data to the database. You can specify up to two filters. The order of execution is "into1 → into2". If the filter option of the execute method exists, it will be executed in the order of "filter option->into1->into2".
 
-from1 and from2 specify the filter to be executed when retrieving data from the database. You can specify up to two filters. The order of execution is "from1 → from2". If the filter attribute of BIx :: Custom :: Result exists, it will be executed in the order of "from1 → from2-> filter attribute".
+from1 and from2 specify the filter to be executed when retrieving data from the database. You can specify up to two filters. The order of execution is "from1 → from2". If the filter attribute of BIx::Custom::Result exists, it will be executed in the order of "from1 → from2->filterattribute".
 
-<h4> Type name specified for into1 and into2 </ h4>
+<h4> Type name specified for into1 and into2 </h4>
 
 Notice that we distinguish between the terms type name and data type. You must specify the type name for into1 and into2.
 
@@ -188,22 +188,22 @@ The type name is generally the name you specified when defining the database tab
 To actually know the type name of each column, use the show_typename method.
 
 <pre>
-$ dbi-> show_typename ('book');
-</ pre>
+$dbi->show_typename('book');
+</pre>
 
 Please use the type name displayed there.
 
-<h4> Data type specified for from1 and from2 </ h4>
+<h4> Data type specified for from1 and from2 </h4>
 
 You must specify the data type for from1 and from2. A data type is an internal data type in a database, typically a number. Generally a number, but if it was a string, the data type must be in lowercase.
 
 To actually know the data type, use the show_datatype method.
 
 <pre>
-$ dbi-> show_datatype ('book');
-</ pre>
+$dbi->show_datatype('book');
+</pre>
 
-<h4> Sample filtering by type </ h4>
+<h4> Sample filtering by type </h4>
 
 Now I would like to write a sample of type filtering using SQLite.
 
@@ -211,30 +211,30 @@ Now I would like to write a sample of type filtering using SQLite.
 use strict;
 use warnings;
 
-use DBIx :: Custom;
-use Time :: Piece;
+use DBIx::Custom;
+use Time::Piece;
 
-my $ dbi = DBIx :: Custom-> connect (dsn => "dbi: SQLite: dbname =: memory:");
-$ dbi-> do ("create table book (id, issue_datetime DATETIME)");
-$ dbi-> register_filter (
+my $dbi = DBIx::Custom->connect(dsn => "dbi: SQLite: dbname =: memory:");
+$dbi->do("create table book (id, issue_datetime DATETIME)");
+$dbi->register_filter(
   tp_to_datetime => sub {
-    my $ tp = shift;
+    my $tp = shift;
     
-    return'' unless defined $ tp;
-    return $ tp unless ref $ tp;
-    return $ tp-> strftime ('% Y-% m-% d% H:% M:% S');
+    return'' unless defined $tp;
+    return $tp unless ref $tp;
+    return $tp->strftime('%Y-%m-%d%H:%M:%S');
   },
   datetime_to_tp => sub {
-    my $ datetime = shift;
+    my $datetime = shift;
     
-    return unless $ datetime;
-    return localtime (
-      Time :: Piece-> strptime ($ datetime,'% Y-% m-% d% H:% M:% S')
+    return unless $datetime;
+    return localtime(
+      Time::Piece->strptime($datetime,'%Y-%m-%d%H:%M:%S')
     )
   }
 );
 
-$ dbi-> type_rule (
+$dbi->type_rule(
   into1 => {
     datetime =>'tp_to_datetime'
   },
@@ -243,20 +243,20 @@ $ dbi-> type_rule (
   }
 );
 
-# Time :: Piece object
-my $ now = localtime;
+# Time::Piece object
+my $now = localtime;
 
-$ dbi-> insert ({id => 1, issue_datetime => $ now}, table =>'book');
+$dbi->insert({id => 1, issue_datetime => $now}, table =>'book');
 
-my $ result = $ dbi-> select (where => {id => 1}, table =>'book');
-my $ issue_datetime = $ result-> one-> {issue_datetime};
+my $result = $dbi->select(where => {id => 1}, table =>'book');
+my $issue_datetime = $result->one->{issue_datetime};
 
-print ref $ issue_datetime;
-</ pre>
+print ref $issue_datetime;
+</pre>
 
-Looking at this sample, when doing an insert, the Time :: Piece object is converted to the database date format, and when fetching and fetching the rows, the database date format is converted to the Time :: Piece object. You can see that it has been done.
+Looking at this sample, when doing an insert, the Time::Piece object is converted to the database date format, and when fetching and fetching the rows, the database date format is converted to the Time::Piece object. You can see that it has been done.
 
-<h4> Disable type_rule </ h4>
+<h4> Disable type_rule </h4>
 
 The into1 filter can be disabled with the type_rule1_off option and the into2 filter can be disabled with the type_rule2_off option. To disable both, use the type_rule_off option.
 
@@ -264,28 +264,25 @@ The into1 filter can be disabled with the type_rule1_off option and the into2 fi
 type_rule1_off => 1
 type_rule2_off => 1
 type_rule_off => 1
-</ pre>
+</pre>
 
 In the insert method, you can write as follows.
 
 <pre>
-$ dbi-> insert ({id => 1, issue_datetime => $ now},
+$dbi->insert({id => 1, issue_datetime => $now},
   type_rule_off => 1, table =>'book');
-</ pre>
+</pre>
 
-The from1 filter can be disabled with the type_rule1_off method of the DBIx :: Custom :: Result object, and the from2 filter can be disabled with the type_rule2_off method. To disable both, use the type_rule_off method.
+The from1 filter can be disabled with the type_rule1_off method of the DBIx::Custom::Result object, and the from2 filter can be disabled with the type_rule2_off method. To disable both, use the type_rule_off method.
 
 <pre>
-$ result-> type_rule1_off
-$ result-> type_rule2_off
-$ result-> type_rule_off
-</ pre>
+$result->type_rule1_off$result->type_rule2_off$result->type_rule_off</pre>
 
 Conversely, use the type_rule1_on, type_rule2_on, type_rule_on methods to enable the filter.
 
-<h4> Implementation of type_rule </ h4>
+<h4> Implementation of type_rule </h4>
 
-<b> Implementation of into1 and into2 </ b>
+<b> Implementation of into1 and into2 </b>
 
 The implementation of type_rule looks like this: Filters by into1 and into2 are filters that you can specify when sending data to the database.
 
@@ -298,21 +295,21 @@ Then decide which filter to apply when executing the execute method. Methods suc
 The examples of insert and execute explain when filtering is applied. See the next insert.
 
 <pre>
-$ dbi-> insert ({issue_datetime => '2010-11-10 11:34:56'}, table =>'book'});
-</ pre>
+$dbi->insert({issue_datetime => '2010-11-10 11:34:56'}, table =>'book'});
+</pre>
 
-DBIx :: Custom remembers that issue_datetime in the book table is of type DATETIME when the type_rule method is called.
+DBIx::Custom remembers that issue_datetime in the book table is of type DATETIME when the type_rule method is called.
 
 And in the above insert, book is specified as the table name and issue_datetime is specified as the column name, so filtering will be executed.
 
 Next is the execute method. Filtering is not applied in the following cases.
 
 <pre>
-$ dbi-> execute (
+$dbi->execute(
   "select * from book where: issue_datetime {=}",
   {issue_datetime => '2010-11-10 11:34:56'}
 );
-</ pre>
+</pre>
 
 Because the table name is not specified, it is not possible to know which table has the issue_datetime column.
 
@@ -320,44 +317,44 @@ Therefore, if you add the table name to the beginning or specify the table name 
 
 <pre>
 #Add table name
-$ dbi-> execute (
+$dbi->execute(
   "select * from book where: book.issue_datetime {=}",
   {issue_datetime => '2010-11-10 11:34:56'}
 );
 
 # table option
-$ dbi-> execute (
+$dbi->execute(
   "select * from book where: issue_datetime {=}",
   {issue_datetime => '2010-11-10 11:34:56'}, table =>'book'
 );
-</ pre>
+</pre>
 
-<b> Implementation of from1 and from2 </ b>
+<b> Implementation of from1 and from2 </b>
 
 From1 and from2 don't have to think difficult. Since you can easily know the data type when fetching, filter based on that information. With the column option, you don't have to think about difficult things when specifying a column.
 
 
-<h3> Register the filter function --register_filter </ h3>
+<h3> Register the filter function --register_filter </h3>
 
-Use the <strong> register_filter </ strong> method to register the filter function.
+Use the <strong> register_filter </strong> method to register the filter function.
 
 <pre>
-$ dbi-> register_filter (
-  # Time :: Piece object to database DATE format
+$dbi->register_filter(
+  # Time::Piece object to database DATE format
   tp_to_date => sub {
-    my $ tp = shift;
-    return $ tp-> strftime ('% Y-% m-% d');
+    my $tp = shift;
+    return $tp->strftime('%Y-%m-%d');
   },
-  # database DATE format to Time :: Piece object
+  # database DATE format to Time::Piece object
   date_to_tp => sub {
-    my $ date = shift;
-     return Time :: Piece-> strptime ($ date,'% Y-% m-% d');
+    my $date = shift;
+     return Time::Piece->strptime($date,'%Y-%m-%d');
   }
 );
-</ pre>
+</pre>
 
 The filter registered here can be used with the filter option such as execute method.
 
 <pre>
-$ dbi-> execute ($ sql, $ param, filter => {issue_date =>'tp_to_date'});
-</ pre>
+$dbi->execute($sql, $param, filter => {issue_date =>'tp_to_date'});
+</pre>
